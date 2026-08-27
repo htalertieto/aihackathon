@@ -1,4 +1,7 @@
-const API_BASE = '/api';
+// In local dev, Vite proxies '/api' to the backend (see vite.config.js).
+// In production, set VITE_API_BASE_URL (e.g. https://medtranslate-api.azurewebsites.net/api)
+// as a build-time env var so the deployed frontend can reach the deployed backend.
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
 
 async function handleResponse(res) {
   const data = await res.json().catch(() => ({}));
