@@ -1,6 +1,6 @@
 # Simple hosting: Vercel (frontend) + Render (backend)
 
-The fastest way to get MedTranslate hosted with GitHub auto-deploy, no CLI or YAML
+The fastest way to get ClariCare hosted with GitHub auto-deploy, no CLI or YAML
 pipelines to babysit. Both platforms watch this repo and redeploy on every push to `main`.
 
 (Prefer Azure instead? See [DEPLOYMENT.md](./DEPLOYMENT.md).)

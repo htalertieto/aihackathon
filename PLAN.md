@@ -1,4 +1,4 @@
-# MedTranslate — Patient Diagnosis Translator
+# ClariCare — Patient Diagnosis Translator
 
 ## Problem
 Patients often can't understand a doctor's diagnosis because of language barriers or medical
@@ -36,13 +36,13 @@ frontend (React + Vite)  <--- REST/JSON --->  backend (Node + Express)
 3. Frontend renders a patient-friendly card in the target language.
 
 ### Model routing
-| Task                         | Model       | Endpoint type              |
-|-------------------------------|-------------|-----------------------------|
-| Explain/translate (primary)  | gpt-5.4     | Azure OpenAI Responses API  |
-| Alt/experimentation          | gpt-5.3-codex, gpt-5.2 | Azure OpenAI Responses API |
-| Image/medical-document OCR   | lingshu-7b  | CareKube chat/completions (vision) |
-| Medical term grounding       | med42       | CareKube chat/completions (text) |
-| Audio transcription          | gpt-5.4     | Azure Responses API (input_audio) |
+| Task                        | Model                  | Endpoint type                      |
+| --------------------------- | ---------------------- | ---------------------------------- |
+| Explain/translate (primary) | gpt-5.4                | Azure OpenAI Responses API         |
+| Alt/experimentation         | gpt-5.3-codex, gpt-5.2 | Azure OpenAI Responses API         |
+| Image/medical-document OCR  | lingshu-7b             | CareKube chat/completions (vision) |
+| Medical term grounding      | med42                  | CareKube chat/completions (text)   |
+| Audio transcription         | gpt-5.4                | Azure Responses API (input_audio)  |
 
 ## Backend (Node.js / Express)
 - `src/server.js` — app entry, CORS, JSON body limit for base64 media.

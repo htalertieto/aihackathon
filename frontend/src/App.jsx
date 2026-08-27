@@ -1,4 +1,11 @@
 import { useState } from "react";
+import {
+  ChatBubbleLeftRightIcon,
+  DocumentTextIcon,
+  LanguageIcon,
+  MicrophoneIcon,
+  PhotoIcon,
+} from "@heroicons/react/24/outline";
 import LanguageSelect from "./components/LanguageSelect.jsx";
 import Recorder from "./components/Recorder.jsx";
 import ChatPanel from "./components/ChatPanel.jsx";
@@ -7,12 +14,12 @@ import ResultCard from "./components/ResultCard.jsx";
 import { submitText, submitImage } from "./api.js";
 import { convertPdfToPng } from "./pdfToImage.js";
 
-const TABS = ["Chat", "Type", "Record", "Upload Image", "Upload PDF"];
+const TOOLS = ["Type", "Record", "Upload Image", "Upload PDF"];
 
 export default function App() {
-  const [tab, setTab] = useState("Type");
+  const [tool, setTool] = useState("Type");
   const [text, setText] = useState("");
-  const [targetLanguage, setTargetLanguage] = useState("Spanish");
+  const [targetLanguage, setTargetLanguage] = useState("English");
   const [recordingMode, setRecordingMode] = useState("automatic");
   const [recordedText, setRecordedText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,8 +31,7 @@ export default function App() {
     setError("");
     setResult(null);
     try {
-      const data = await promise;
-      setResult(data);
+      setResult(await promise);
     } catch (err) {
       setError(err.message || "Something went wrong");
     } finally {
@@ -33,10 +39,10 @@ export default function App() {
     }
   }
 
-  function handleTypeSubmit(e) {
-    e.preventDefault();
-    if (!text.trim()) return;
-    run(submitText({ text, targetLanguage, useMedicalGrounding: true }));
+  function handleTypeSubmit(event) {
+    event.preventDefault();
+    if (text.trim())
+      run(submitText({ text, targetLanguage, useMedicalGrounding: true }));
   }
 
   function handleTranscript(transcript) {
@@ -48,21 +54,22 @@ export default function App() {
           useMedicalGrounding: true,
         }),
       );
-      return;
+    } else {
+      setRecordedText(transcript);
     }
-    setRecordedText(transcript);
   }
 
   function handleRecordedTextSubmit(event) {
     event.preventDefault();
-    if (!recordedText.trim()) return;
-    run(
-      submitText({
-        text: recordedText,
-        targetLanguage,
-        useMedicalGrounding: true,
-      }),
-    );
+    if (recordedText.trim()) {
+      run(
+        submitText({
+          text: recordedText,
+          targetLanguage,
+          useMedicalGrounding: true,
+        }),
+      );
+    }
   }
 
   function handleImage(file) {
@@ -79,127 +86,155 @@ export default function App() {
 
   return (
     <div className="app">
-      <header>
-        <h1>🩺 MedTranslate</h1>
-        <p>Understand your diagnosis, in your language.</p>
+      <header className="app-header">
+        <div className="brand-lockup">
+          <ChatBubbleLeftRightIcon aria-hidden="true" />
+          <div>
+            <h1>ClariCare</h1>
+            <p>Present medical information without language barrier</p>
+          </div>
+        </div>
       </header>
 
       <div className="controls-bar">
+        <LanguageIcon aria-hidden="true" />
         <LanguageSelect value={targetLanguage} onChange={setTargetLanguage} />
       </div>
 
-      <nav className="tabs">
-        {TABS.map((t) => (
-          <button
-            key={t}
-            className={t === tab ? "active" : ""}
-            onClick={() => setTab(t)}
-            type="button"
-          >
-            {t}
-          </button>
-        ))}
-      </nav>
+      <main className="workspace">
+        <ChatPanel patientLanguage={targetLanguage} />
 
-      <main>
-        {tab === "Type" && (
-          <form onSubmit={handleTypeSubmit} className="panel">
-            <textarea
-              rows={6}
-              placeholder="Type or paste what the doctor said, or notes from your visit..."
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-            />
-            <button type="submit" disabled={loading || !text.trim()}>
-              {loading ? "Processing…" : "Explain & Translate"}
-            </button>
-          </form>
-        )}
-
-        {tab === "Record" && (
-          <div className="panel">
-            <p>
-              Speak naturally. Your browser transcribes the speech, then we
-              explain and translate the text.
-            </p>
-            <div className="mode-switch" aria-label="Transcript handling mode">
-              <button
-                type="button"
-                className={recordingMode === "automatic" ? "active" : ""}
-                aria-pressed={recordingMode === "automatic"}
-                onClick={() => setRecordingMode("automatic")}
-              >
-                Send automatically
-              </button>
-              <button
-                type="button"
-                className={recordingMode === "edit" ? "active" : ""}
-                aria-pressed={recordingMode === "edit"}
-                onClick={() => setRecordingMode("edit")}
-              >
-                Edit before sending
-              </button>
+        <section
+          className="panel tools-panel"
+          aria-label="Medical explanation tools"
+        >
+          <div className="tools-header">
+            <span className="icon-disc">
+              <DocumentTextIcon aria-hidden="true" />
+            </span>
+            <div>
+              <h2>Explain medical information</h2>
+              <p>Patient-friendly instructions and translations</p>
             </div>
-            <Recorder onTranscriptReady={handleTranscript} disabled={loading} />
-            {recordingMode === "edit" && recordedText && (
-              <form
-                onSubmit={handleRecordedTextSubmit}
-                className="recorded-text-form"
+          </div>
+
+          <nav className="tool-tabs" aria-label="Medical explanation tools">
+            {TOOLS.map((item) => (
+              <button
+                key={item}
+                type="button"
+                className={item === tool ? "active" : ""}
+                onClick={() => setTool(item)}
               >
-                <label htmlFor="recorded-text">
-                  Review the recognized text
-                </label>
-                <textarea
-                  id="recorded-text"
-                  rows={5}
-                  value={recordedText}
-                  onChange={(event) => setRecordedText(event.target.value)}
-                />
+                {item}
+              </button>
+            ))}
+          </nav>
+
+          {tool === "Type" && (
+            <form onSubmit={handleTypeSubmit} className="tool-content">
+              <textarea
+                rows={7}
+                placeholder="Type or paste what the doctor said, or notes from the visit..."
+                value={text}
+                onChange={(event) => setText(event.target.value)}
+              />
+              <button type="submit" disabled={loading || !text.trim()}>
+                Explain in my language
+              </button>
+            </form>
+          )}
+
+          {tool === "Record" && (
+            <div className="tool-content">
+              <div className="tool-intro">
+                <MicrophoneIcon aria-hidden="true" /> Speak naturally to
+                transcribe and explain.
+              </div>
+              <div
+                className="mode-switch"
+                aria-label="Transcript handling mode"
+              >
                 <button
-                  type="submit"
-                  disabled={loading || !recordedText.trim()}
+                  type="button"
+                  className={recordingMode === "automatic" ? "active" : ""}
+                  onClick={() => setRecordingMode("automatic")}
                 >
-                  Explain & Translate
+                  Send automatically
                 </button>
-              </form>
-            )}
-          </div>
-        )}
+                <button
+                  type="button"
+                  className={recordingMode === "edit" ? "active" : ""}
+                  onClick={() => setRecordingMode("edit")}
+                >
+                  Edit before sending
+                </button>
+              </div>
+              <Recorder
+                onTranscriptReady={handleTranscript}
+                disabled={loading}
+              />
+              {recordingMode === "edit" && recordedText && (
+                <form
+                  onSubmit={handleRecordedTextSubmit}
+                  className="recorded-text-form"
+                >
+                  <label htmlFor="recorded-text">
+                    Review the recognized text
+                  </label>
+                  <textarea
+                    id="recorded-text"
+                    rows={5}
+                    value={recordedText}
+                    onChange={(event) => setRecordedText(event.target.value)}
+                  />
+                  <button
+                    type="submit"
+                    disabled={loading || !recordedText.trim()}
+                  >
+                    Explain in my language
+                  </button>
+                </form>
+              )}
+            </div>
+          )}
 
-        {tab === "Chat" && <ChatPanel patientLanguage={targetLanguage} />}
+          {tool === "Upload Image" && (
+            <div className="tool-content">
+              <div className="tool-intro">
+                <PhotoIcon aria-hidden="true" /> Upload a prescription, report,
+                or discharge notes.
+              </div>
+              <FileUpload
+                accept="image/*"
+                label="Choose image"
+                onFileSelected={handleImage}
+                disabled={loading}
+              />
+            </div>
+          )}
 
-        {tab === "Upload Image" && (
-          <div className="panel">
-            <p>Upload a photo of a prescription, report, or discharge notes.</p>
-            <FileUpload
-              accept="image/*"
-              label="📷 Choose image"
-              onFileSelected={handleImage}
-              disabled={loading}
-            />
-          </div>
-        )}
+          {tool === "Upload PDF" && (
+            <div className="tool-content">
+              <div className="tool-intro">
+                <DocumentTextIcon aria-hidden="true" /> PDF pages are converted
+                to an image in your browser before analysis.
+              </div>
+              <FileUpload
+                accept="application/pdf"
+                label="Choose PDF"
+                onFileSelected={handlePdf}
+                disabled={loading}
+              />
+            </div>
+          )}
 
-        {tab === "Upload PDF" && (
-          <div className="panel">
-            <p>
-              Upload a PDF medical report. Its pages are converted to an image
-              in your browser before analysis.
-            </p>
-            <FileUpload
-              accept="application/pdf"
-              label="📄 Choose PDF"
-              onFileSelected={handlePdf}
-              disabled={loading}
-            />
-          </div>
-        )}
-
-        {loading && (
-          <p className="loading">Analyzing… this can take a few seconds.</p>
-        )}
-        {error && <p className="error">⚠️ {error}</p>}
-        {tab !== "Chat" && <ResultCard result={result} />}
+          {loading && (
+            <p className="loading">Analyzing… this can take a few seconds.</p>
+          )}
+          {error && <p className="error">{error}</p>}
+          <ResultCard result={result} />
+        </section>
       </main>
 
       <footer>

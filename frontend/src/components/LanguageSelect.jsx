@@ -1,6 +1,6 @@
 const LANGUAGES = [
-  'Spanish', 'French', 'German', 'Polish', 'Ukrainian', 'Arabic', 'Mandarin Chinese',
-  'Hindi', 'Portuguese', 'Russian', 'Vietnamese', 'Tagalog', 'Korean', 'Italian', 'English',
+  'English', 'Polish', 'Hindi', 'Spanish', 'French', 'German', 'Ukrainian', 'Arabic',
+  'Mandarin Chinese', 'Portuguese', 'Russian', 'Vietnamese', 'Tagalog', 'Korean', 'Italian',
 ];
 
 export default function LanguageSelect({ value, onChange }) {

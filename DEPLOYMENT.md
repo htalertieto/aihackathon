@@ -1,4 +1,4 @@
-# Deploying MedTranslate to Azure
+# Deploying ClariCare to Azure
 
 This sets up **continuous deployment from GitHub**: every push to `main` that touches
 `backend/**` redeploys the API, and every push touching `frontend/**` redeploys the UI.
