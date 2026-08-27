@@ -47,3 +47,12 @@ export function submitImage(args) {
 export function submitAudio(args) {
   return submitFile({ ...args, endpoint: 'audio' });
 }
+
+export async function submitFollowUp({ context, targetLanguage, history, question }) {
+  const res = await fetch(`${API_BASE}/followup`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ context, targetLanguage, history, question }),
+  });
+  return handleResponse(res);
+}
