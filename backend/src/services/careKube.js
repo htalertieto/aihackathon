@@ -17,7 +17,7 @@ async function callChatCompletion({ model, messages, maxTokens = 1000, temperatu
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${API_KEY}`,
+      'X-API-KEY': API_KEY,
     },
     body: JSON.stringify({
       model,
@@ -27,7 +27,18 @@ async function callChatCompletion({ model, messages, maxTokens = 1000, temperatu
     }),
   });
 
-  const data = await res.json();
+  const rawBody = await res.text();
+  let data;
+  try {
+    data = rawBody ? JSON.parse(rawBody) : {};
+  } catch {
+    // Non-JSON response (e.g. an auth/gateway error page or plain-text message).
+    const snippet = rawBody.slice(0, 200);
+    throw new Error(
+      `CareKube returned a non-JSON response (${res.status} ${res.statusText}): ${snippet}`
+    );
+  }
+
   if (!res.ok) {
     const message = data?.error?.message || `CareKube request failed (${res.status})`;
     throw new Error(message);
