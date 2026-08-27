@@ -142,7 +142,7 @@ export default function App() {
                 onChange={(event) => setText(event.target.value)}
               />
               <button type="submit" disabled={loading || !text.trim()}>
-                Explain in my language
+                Translate and explain
               </button>
             </form>
           )}
@@ -194,7 +194,7 @@ export default function App() {
                     type="submit"
                     disabled={loading || !recordedText.trim()}
                   >
-                    Explain in my language
+                    Translate and explain
                   </button>
                 </form>
               )}
