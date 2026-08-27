@@ -1,11 +1,11 @@
 import { useState } from "react";
 import {
-  ChatBubbleLeftRightIcon,
   DocumentTextIcon,
   LanguageIcon,
   MicrophoneIcon,
   PhotoIcon,
 } from "@heroicons/react/24/outline";
+import logo from "./components/assets/logo.png";
 import LanguageSelect from "./components/LanguageSelect.jsx";
 import Recorder from "./components/Recorder.jsx";
 import ChatPanel from "./components/ChatPanel.jsx";
@@ -90,7 +90,7 @@ export default function App() {
     <div className="app">
       <header className="app-header">
         <div className="brand-lockup">
-          <ChatBubbleLeftRightIcon aria-hidden="true" />
+          <img src={logo} alt="ClariCare logo" />
           <div>
             <h1>ClariCare</h1>
             <p>Present medical information without language barrier</p>
@@ -237,7 +237,10 @@ export default function App() {
           {error && <p className="error">{error}</p>}
           <ResultCard result={result} />
           {result && (
-            <ExportOpenEhrButton result={result} targetLanguage={targetLanguage} />
+            <ExportOpenEhrButton
+              result={result}
+              targetLanguage={targetLanguage}
+            />
           )}
           {result && (
             <FollowUpChat context={result} targetLanguage={targetLanguage} />
