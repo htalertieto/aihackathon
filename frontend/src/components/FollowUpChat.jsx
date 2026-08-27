@@ -3,7 +3,7 @@ import { submitFollowUp } from '../api.js';
 
 // Simple, dependency-free string hash so we can key a conversation to its
 // source document without needing any backend/database.
-function hashKey(value) {
+export function hashKey(value) {
   let hash = 0;
   const str = JSON.stringify(value);
   for (let i = 0; i < str.length; i += 1) {

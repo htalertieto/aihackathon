@@ -56,3 +56,18 @@ export async function submitFollowUp({ context, targetLanguage, history, questio
   });
   return handleResponse(res);
 }
+
+// Fetches an openEHR-style COMPOSITION export for the given result (and
+// optional follow-up history) and returns it as a Blob for download.
+export async function exportOpenEhr({ result, targetLanguage, history, patient }) {
+  const res = await fetch(`${API_BASE}/export/openehr`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ result, targetLanguage, history, patient, download: true }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || `Request failed (${res.status})`);
+  }
+  return res.blob();
+}
