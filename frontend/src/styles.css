@@ -4,7 +4,7 @@
 
 body {
   margin: 0;
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-family: "Segoe UI", system-ui, sans-serif;
   background: #f4f7fb;
   color: #1a2233;
 }
@@ -55,6 +55,7 @@ header p {
   border: 1px solid #cbd5e1;
   background: white;
   cursor: pointer;
+  color: #33405a;
 }
 
 .tabs button.active {
