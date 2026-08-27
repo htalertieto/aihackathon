@@ -7,6 +7,7 @@ const textRoute = require('./routes/text');
 const imageRoute = require('./routes/image');
 const pdfRoute = require('./routes/pdf');
 const audioRoute = require('./routes/audio');
+const chatRoute = require('./routes/chat');
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use('/api/text', textRoute);
 app.use('/api/image', imageRoute);
 app.use('/api/pdf', pdfRoute);
 app.use('/api/audio', audioRoute);
+app.use('/api/chat', chatRoute);
 
 // Centralized error handler
 // eslint-disable-next-line no-unused-vars

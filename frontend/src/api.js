@@ -20,6 +20,15 @@ export async function submitText({ text, targetLanguage, useMedicalGrounding }) 
   return handleResponse(res);
 }
 
+export async function translateChatMessage({ text, targetLanguage, sourceLanguage }) {
+  const res = await fetch(`${API_BASE}/chat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, targetLanguage, sourceLanguage }),
+  });
+  return handleResponse(res);
+}
+
 export async function submitFile({ endpoint, file, targetLanguage }) {
   const form = new FormData();
   form.append('file', file);

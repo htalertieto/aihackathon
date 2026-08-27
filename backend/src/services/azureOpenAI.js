@@ -106,6 +106,30 @@ async function transcribeAudio({ audioBase64, format = 'wav', model }) {
   return text;
 }
 
+/**
+ * Detect a message's language and translate it for the other participant in a chat.
+ */
+async function translateChatMessage({ text, targetLanguage, sourceLanguage, model }) {
+  const instructions = [
+    'You are a live interpreter for a conversation between a healthcare worker and a patient.',
+    'Detect the language of the source message and translate it faithfully into the requested target language.',
+    'Do not add explanations, medical advice, greetings, or commentary.',
+    `The requested target language is: ${targetLanguage}.`,
+    sourceLanguage ? `The source language is expected to be: ${sourceLanguage}.` : '',
+    'Respond ONLY with valid minified JSON, with no markdown fences:',
+    '{"sourceLanguage":string,"translatedText":string}',
+  ].filter(Boolean).join(' ');
+
+  const input = [{ role: 'user', content: [{ type: 'input_text', text }] }];
+  const { text: raw } = await callResponses({ model, input, instructions, maxOutputTokens: 800 });
+  const result = parseJsonSafely(raw);
+
+  if (!result.sourceLanguage || !result.translatedText) {
+    throw new Error('Model did not return a translated chat message.');
+  }
+  return result;
+}
+
 function parseJsonSafely(raw) {
   if (!raw) throw new Error('Empty response from model');
   const cleaned = raw.trim().replace(/^```json\s*|^```\s*|```$/g, '');
@@ -128,4 +152,5 @@ module.exports = {
   callResponses,
   explainAndTranslate,
   transcribeAudio,
+  translateChatMessage,
 };

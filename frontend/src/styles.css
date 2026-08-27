@@ -144,6 +144,74 @@ button.danger {
   font-size: 14px;
 }
 
+.chat-panel {
+  gap: 16px;
+}
+
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.chat-header h2,
+.chat-header p {
+  margin: 0;
+}
+
+.chat-header p,
+.chat-empty {
+  color: #5b6678;
+}
+
+button.secondary {
+  background: white;
+  border: 1px solid #cbd5e1;
+  color: #33405a;
+  padding: 8px 14px;
+}
+
+.chat-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chat-message {
+  border-radius: 10px;
+  padding: 12px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+}
+
+.chat-message.patient {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.chat-message p {
+  margin: 6px 0 0;
+}
+
+.chat-translation {
+  border-top: 1px solid rgba(51, 65, 90, 0.16);
+  margin-top: 10px;
+  padding-top: 10px;
+}
+
+.chat-compose {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chat-compose label,
+.chat-message strong {
+  color: #33405a;
+  font-size: 14px;
+}
+
 .pulse {
   color: #dc2626;
   font-weight: 600;
