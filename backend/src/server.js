@@ -8,6 +8,8 @@ const imageRoute = require("./routes/image");
 const pdfRoute = require("./routes/pdf");
 const audioRoute = require("./routes/audio");
 const chatRoute = require("./routes/chat");
+const followupRoute = require("./routes/followup");
+const exportRoute = require("./routes/export");
 
 const app = express();
 
@@ -20,6 +22,8 @@ app.use("/api/image", imageRoute);
 app.use("/api/pdf", pdfRoute);
 app.use("/api/audio", audioRoute);
 app.use("/api/chat", chatRoute);
+app.use("/api/followup", followupRoute);
+app.use("/api/export/openehr", exportRoute);
 
 // Centralized error handler
 // eslint-disable-next-line no-unused-vars

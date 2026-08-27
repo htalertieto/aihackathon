@@ -1,4 +1,4 @@
-const { explainAndTranslate, transcribeAudio } = require('./azureOpenAI');
+const { explainAndTranslate, transcribeAudio, answerFollowUp } = require('./azureOpenAI');
 const { describeMedicalImage, groundMedicalText } = require('./careKube');
 
 /**
@@ -31,4 +31,4 @@ async function processAudio({ audioBase64, format, targetLanguage, model }) {
   return { ...result, transcript };
 }
 
-module.exports = { processText, processImage, processAudio };
+module.exports = { processText, processImage, processAudio, answerFollowUp };

@@ -159,6 +159,48 @@ async function translateChatMessage({
   return result;
 }
 
+/**
+ * Answer a patient's follow-up question about a previously explained document,
+ * using the original context and prior Q&A turns for continuity. No data is
+ * persisted server-side — the caller (browser) is responsible for keeping and
+ * resending the conversation history on each call.
+ */
+async function answerFollowUp({ context, targetLanguage, history = [], question, model }) {
+  const instructions = [
+    'You are MedTranslate, an assistant that helps patients understand medical information.',
+    `Answer the patient's follow-up question in simple, non-alarming, plain language,`,
+    `written entirely in the patient's language: ${targetLanguage}.`,
+    'Base your answer on the medical context provided below and the prior conversation.',
+    "If the question can't be answered from the given context, say so and suggest asking",
+    'their doctor or pharmacist, rather than guessing.',
+    'Always remind the patient this is not a substitute for professional medical advice',
+    'when relevant (e.g. dosing, urgent symptoms).',
+    'Respond ONLY with valid minified JSON, no markdown fences:',
+    '{"answer":string,"disclaimer":string}',
+  ].join(' ');
+
+  const contextBlock = [
+    'ORIGINAL MEDICAL CONTEXT:',
+    context?.sourceText ? `Source text: ${context.sourceText}` : null,
+    context?.summary ? `Summary: ${context.summary}` : null,
+    context?.translatedText ? `Translated explanation: ${context.translatedText}` : null,
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  const input = [
+    { role: 'user', content: [{ type: 'input_text', text: contextBlock }] },
+    ...history.map((turn) => ({
+      role: turn.role === 'assistant' ? 'assistant' : 'user',
+      content: [{ type: turn.role === 'assistant' ? 'output_text' : 'input_text', text: turn.text }],
+    })),
+    { role: 'user', content: [{ type: 'input_text', text: question }] },
+  ];
+
+  const { text: raw } = await callResponses({ model, input, instructions, maxOutputTokens: 800 });
+  return parseJsonSafely(raw);
+}
+
 function parseJsonSafely(raw) {
   if (!raw) throw new Error("Empty response from model");
   const cleaned = raw.trim().replace(/^```json\s*|^```\s*|```$/g, "");
@@ -184,4 +226,5 @@ module.exports = {
   explainAndTranslate,
   transcribeAudio,
   translateChatMessage,
+  answerFollowUp,
 };

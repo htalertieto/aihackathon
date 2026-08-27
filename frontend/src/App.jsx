@@ -11,6 +11,7 @@ import Recorder from "./components/Recorder.jsx";
 import ChatPanel from "./components/ChatPanel.jsx";
 import FileUpload from "./components/FileUpload.jsx";
 import ResultCard from "./components/ResultCard.jsx";
+import FollowUpChat from "./components/FollowUpChat.jsx";
 import { submitText, submitImage } from "./api.js";
 import { convertPdfToPng } from "./pdfToImage.js";
 
@@ -234,6 +235,9 @@ export default function App() {
           )}
           {error && <p className="error">{error}</p>}
           <ResultCard result={result} />
+          {result && (
+            <FollowUpChat context={result} targetLanguage={targetLanguage} />
+          )}
         </section>
       </main>
 

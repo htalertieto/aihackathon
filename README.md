@@ -53,9 +53,35 @@ Open http://localhost:5173, pick a target language, and try the **Type**, **Reco
 - `POST /api/image` multipart `file` + `targetLanguage`
 - `POST /api/pdf` multipart `file` + `targetLanguage`
 - `POST /api/audio` multipart `file` + `targetLanguage`
+- `POST /api/followup` `{ context, targetLanguage, history?, question }` — stateless
+  follow-up Q&A about a previous result. `context` is the original result object
+  (or at least `sourceText`/`summary`/`translatedText`), `history` is the prior
+  `[{role, text}]` turns. No data is stored server-side — the browser keeps and
+  resends the conversation (see "Follow-up questions" below).
+- `POST /api/export/openehr` `{ result, targetLanguage, history?, patient?, download? }`
+  — exports the given analysis result (and optional follow-up history) as an
+  [openEHR](https://openehr.org/)-style `COMPOSITION` JSON document (canonical RM
+  serialization: `DV_TEXT`, `DV_CODED_TEXT`, `EVENT_CONTEXT`, `SECTION`/`EVALUATION`/
+  `ADMIN_ENTRY`, etc.). Backend-only, stateless — nothing is persisted. Set
+  `download: true` to receive a `Content-Disposition: attachment` response. This is a
+  best-effort generic export (generic archetype ids, not a published/clinically
+  reviewed openEHR template) intended for interoperability demos, not a certified
+  openEHR export.
 - `GET /api/health`
 
 All return: `{ summary, keyTerms: [{term, plainMeaning}], translatedText, actionItems: [], disclaimer, ...sourceFields }`
+
+## Follow-up questions
+
+After getting an explanation, the UI shows an "Ask a follow-up question" box. This
+conversation is **browser-only** — no database, no server-side session:
+- The full Q&A history is kept in the browser's `sessionStorage`, keyed to the current
+  document (cleared automatically when the tab closes).
+- Each new question resends the original context + full prior history to
+  `POST /api/followup`, which is entirely stateless server-side.
+- Refreshing the page keeps the conversation (same tab); opening a new tab or closing
+  the browser starts fresh.
+
 
 ## Known notes
 - Frontend dev dependency `vite`/`esbuild` has a known moderate dev-server-only CORS
