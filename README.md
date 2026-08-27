@@ -58,6 +58,15 @@ Open http://localhost:5173, pick a target language, and try the **Type**, **Reco
   (or at least `sourceText`/`summary`/`translatedText`), `history` is the prior
   `[{role, text}]` turns. No data is stored server-side — the browser keeps and
   resends the conversation (see "Follow-up questions" below).
+- `POST /api/export/openehr` `{ result, targetLanguage, history?, patient?, download? }`
+  — exports the given analysis result (and optional follow-up history) as an
+  [openEHR](https://openehr.org/)-style `COMPOSITION` JSON document (canonical RM
+  serialization: `DV_TEXT`, `DV_CODED_TEXT`, `EVENT_CONTEXT`, `SECTION`/`EVALUATION`/
+  `ADMIN_ENTRY`, etc.). Backend-only, stateless — nothing is persisted. Set
+  `download: true` to receive a `Content-Disposition: attachment` response. This is a
+  best-effort generic export (generic archetype ids, not a published/clinically
+  reviewed openEHR template) intended for interoperability demos, not a certified
+  openEHR export.
 - `GET /api/health`
 
 All return: `{ summary, keyTerms: [{term, plainMeaning}], translatedText, actionItems: [], disclaimer, ...sourceFields }`
