@@ -5,7 +5,8 @@ or uploading a photo/PDF of medical documents — then explains it in plain lang
 translates it into the patient's own language.
 
 See [PLAN.md](./PLAN.md) for architecture and design details.
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for hosting this on Azure with GitHub Actions CI/CD.
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for hosting this on Azure with GitHub Actions CI/CD,
+or [DEPLOYMENT-SIMPLE.md](./DEPLOYMENT-SIMPLE.md) for the quicker Vercel + Render route.
 
 ## Project layout
 ```

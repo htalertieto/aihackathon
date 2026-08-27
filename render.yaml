@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: medtranslate-api
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: AZURE_OPENAI_ENDPOINT
+        sync: false
+      - key: AZURE_OPENAI_KEY
+        sync: false
+      - key: AZURE_OPENAI_PRIMARY_MODEL
+        value: gpt-5.4
+      - key: AZURE_OPENAI_ALT_MODELS
+        value: gpt-5.3-codex,gpt-5.2
+      - key: CAREKUBE_ENDPOINT
+        sync: false
+      - key: CAREKUBE_KEY
+        sync: false
+      - key: CAREKUBE_VISION_MODEL
+        value: lingshu-7b
+      - key: CAREKUBE_MEDICAL_TEXT_MODEL
+        value: med42
+      - key: CORS_ORIGIN
+        sync: false   # set to your Vercel frontend URL once deployed
