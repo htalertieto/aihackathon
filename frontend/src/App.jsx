@@ -3,7 +3,8 @@ import LanguageSelect from './components/LanguageSelect.jsx';
 import Recorder from './components/Recorder.jsx';
 import FileUpload from './components/FileUpload.jsx';
 import ResultCard from './components/ResultCard.jsx';
-import { submitText, submitImage, submitPdf, submitAudio } from './api.js';
+import { submitText, submitImage } from './api.js';
+import { convertPdfToPng } from './pdfToImage.js';
 
 const TABS = ['Type', 'Record', 'Upload Image', 'Upload PDF'];
 
@@ -11,6 +12,8 @@ export default function App() {
   const [tab, setTab] = useState('Type');
   const [text, setText] = useState('');
   const [targetLanguage, setTargetLanguage] = useState('Spanish');
+  const [recordingMode, setRecordingMode] = useState('automatic');
+  const [recordedText, setRecordedText] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
@@ -35,9 +38,18 @@ export default function App() {
     run(submitText({ text, targetLanguage, useMedicalGrounding: true }));
   }
 
-  function handleRecording(blob) {
-    const file = new File([blob], 'recording.webm', { type: blob.type });
-    run(submitAudio({ file, targetLanguage }));
+  function handleTranscript(transcript) {
+    if (recordingMode === 'automatic') {
+      run(submitText({ text: transcript, targetLanguage, useMedicalGrounding: true }));
+      return;
+    }
+    setRecordedText(transcript);
+  }
+
+  function handleRecordedTextSubmit(event) {
+    event.preventDefault();
+    if (!recordedText.trim()) return;
+    run(submitText({ text: recordedText, targetLanguage, useMedicalGrounding: true }));
   }
 
   function handleImage(file) {
@@ -45,7 +57,9 @@ export default function App() {
   }
 
   function handlePdf(file) {
-    run(submitPdf({ file, targetLanguage }));
+    run(
+      convertPdfToPng(file).then((image) => submitImage({ file: image, targetLanguage })),
+    );
   }
 
   return (
@@ -89,8 +103,40 @@ export default function App() {
 
         {tab === 'Record' && (
           <div className="panel">
-            <p>Record the doctor speaking, then we'll transcribe, explain, and translate it.</p>
-            <Recorder onRecordingReady={handleRecording} disabled={loading} />
+            <p>Speak naturally. Your browser transcribes the speech, then we explain and translate the text.</p>
+            <div className="mode-switch" aria-label="Transcript handling mode">
+              <button
+                type="button"
+                className={recordingMode === 'automatic' ? 'active' : ''}
+                aria-pressed={recordingMode === 'automatic'}
+                onClick={() => setRecordingMode('automatic')}
+              >
+                Send automatically
+              </button>
+              <button
+                type="button"
+                className={recordingMode === 'edit' ? 'active' : ''}
+                aria-pressed={recordingMode === 'edit'}
+                onClick={() => setRecordingMode('edit')}
+              >
+                Edit before sending
+              </button>
+            </div>
+            <Recorder onTranscriptReady={handleTranscript} disabled={loading} />
+            {recordingMode === 'edit' && recordedText && (
+              <form onSubmit={handleRecordedTextSubmit} className="recorded-text-form">
+                <label htmlFor="recorded-text">Review the recognized text</label>
+                <textarea
+                  id="recorded-text"
+                  rows={5}
+                  value={recordedText}
+                  onChange={(event) => setRecordedText(event.target.value)}
+                />
+                <button type="submit" disabled={loading || !recordedText.trim()}>
+                  Explain & Translate
+                </button>
+              </form>
+            )}
           </div>
         )}
 
@@ -108,7 +154,7 @@ export default function App() {
 
         {tab === 'Upload PDF' && (
           <div className="panel">
-            <p>Upload a PDF medical report.</p>
+            <p>Upload a PDF medical report. Its pages are converted to an image in your browser before analysis.</p>
             <FileUpload
               accept="application/pdf"
               label="📄 Choose PDF"

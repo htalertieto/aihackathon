@@ -106,6 +106,42 @@ button.danger {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
+}
+
+.mode-switch {
+  display: flex;
+  align-self: flex-start;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.mode-switch button {
+  border: 0;
+  border-radius: 0;
+  background: white;
+  color: #33405a;
+}
+
+.mode-switch button + button {
+  border-left: 1px solid #cbd5e1;
+}
+
+.mode-switch button.active {
+  background: #2563eb;
+  color: white;
+}
+
+.recorded-text-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recorded-text-form label {
+  color: #33405a;
+  font-size: 14px;
 }
 
 .pulse {

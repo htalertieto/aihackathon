@@ -35,10 +35,6 @@ export function submitImage(args) {
   return submitFile({ ...args, endpoint: 'image' });
 }
 
-export function submitPdf(args) {
-  return submitFile({ ...args, endpoint: 'pdf' });
-}
-
 export function submitAudio(args) {
   return submitFile({ ...args, endpoint: 'audio' });
 }

@@ -1,46 +1,77 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-export default function Recorder({ onRecordingReady, disabled }) {
+export default function Recorder({ onTranscriptReady, disabled }) {
   const [recording, setRecording] = useState(false);
-  const mediaRecorderRef = useRef(null);
-  const chunksRef = useRef([]);
+  const [interimTranscript, setInterimTranscript] = useState('');
+  const [error, setError] = useState('');
+  const recognitionRef = useRef(null);
 
-  async function startRecording() {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const mediaRecorder = new MediaRecorder(stream);
-    chunksRef.current = [];
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    mediaRecorder.ondataavailable = (e) => {
-      if (e.data.size > 0) chunksRef.current.push(e.data);
+  useEffect(() => () => recognitionRef.current?.abort(), []);
+
+  function startRecording() {
+    if (!SpeechRecognition) {
+      setError('Speech recognition is not supported in this browser. Try a Chromium-based browser.');
+      return;
+    }
+
+    setError('');
+    setInterimTranscript('');
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = true;
+
+    recognition.onresult = (event) => {
+      let finalTranscript = '';
+      let interim = '';
+
+      for (let index = event.resultIndex; index < event.results.length; index += 1) {
+        const transcript = event.results[index][0].transcript;
+        if (event.results[index].isFinal) {
+          finalTranscript += transcript;
+        } else {
+          interim += transcript;
+        }
+      }
+
+      setInterimTranscript(interim);
+      if (finalTranscript.trim()) onTranscriptReady(finalTranscript.trim());
     };
-    mediaRecorder.onstop = () => {
-      const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
-      stream.getTracks().forEach((t) => t.stop());
-      onRecordingReady(blob);
+
+    recognition.onerror = (event) => {
+      if (event.error !== 'aborted') {
+        setError(`Speech recognition failed: ${event.error}. Please try again.`);
+      }
+    };
+    recognition.onend = () => {
+      recognitionRef.current = null;
+      setRecording(false);
     };
 
-    mediaRecorder.start();
-    mediaRecorderRef.current = mediaRecorder;
+    recognition.start();
+    recognitionRef.current = recognition;
     setRecording(true);
   }
 
   function stopRecording() {
-    mediaRecorderRef.current?.stop();
-    setRecording(false);
+    recognitionRef.current?.stop();
   }
 
   return (
     <div className="recorder">
       {!recording ? (
         <button type="button" disabled={disabled} onClick={startRecording}>
-          🎙️ Start recording
+          Start recording
         </button>
       ) : (
         <button type="button" className="danger" onClick={stopRecording}>
-          ⏹️ Stop recording
+          Stop recording
         </button>
       )}
-      {recording && <span className="pulse">Recording…</span>}
+      {recording && <span className="pulse">Listening...</span>}
+      {interimTranscript && <p className="transcript">{interimTranscript}</p>}
+      {error && <p className="error">{error}</p>}
     </div>
   );
 }
